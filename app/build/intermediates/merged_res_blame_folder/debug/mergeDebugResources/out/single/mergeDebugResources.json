@@ -1,0 +1,54 @@
+[
+    {
+        "merged": "com.example.sunmiprinter.app-debug-36:/layout_dialog_image_adjust.xml.flat",
+        "source": "com.example.sunmiprinter.app-main-38:/layout/dialog_image_adjust.xml"
+    },
+    {
+        "merged": "com.example.sunmiprinter.app-debug-36:/mipmap-xhdpi_ic_launcher_round.png.flat",
+        "source": "com.example.sunmiprinter.app-main-38:/mipmap-xhdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.example.sunmiprinter.app-debug-36:/mipmap-hdpi_ic_launcher_round.png.flat",
+        "source": "com.example.sunmiprinter.app-main-38:/mipmap-hdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.example.sunmiprinter.app-debug-36:/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "com.example.sunmiprinter.app-main-38:/mipmap-xxxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.example.sunmiprinter.app-debug-36:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "com.example.sunmiprinter.app-main-38:/mipmap-xhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.example.sunmiprinter.app-debug-36:/layout_activity_main.xml.flat",
+        "source": "com.example.sunmiprinter.app-main-38:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.example.sunmiprinter.app-debug-36:/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "com.example.sunmiprinter.app-main-38:/mipmap-hdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.example.sunmiprinter.app-debug-36:/layout_dialog_rich_text.xml.flat",
+        "source": "com.example.sunmiprinter.app-main-38:/layout/dialog_rich_text.xml"
+    },
+    {
+        "merged": "com.example.sunmiprinter.app-debug-36:/mipmap-mdpi_ic_launcher_round.png.flat",
+        "source": "com.example.sunmiprinter.app-main-38:/mipmap-mdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.example.sunmiprinter.app-debug-36:/mipmap-xxhdpi_ic_launcher_round.png.flat",
+        "source": "com.example.sunmiprinter.app-main-38:/mipmap-xxhdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.example.sunmiprinter.app-debug-36:/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "com.example.sunmiprinter.app-main-38:/mipmap-mdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.example.sunmiprinter.app-debug-36:/mipmap-xxxhdpi_ic_launcher_round.png.flat",
+        "source": "com.example.sunmiprinter.app-main-38:/mipmap-xxxhdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.example.sunmiprinter.app-debug-36:/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "com.example.sunmiprinter.app-main-38:/mipmap-xxhdpi/ic_launcher.png"
+    }
+]

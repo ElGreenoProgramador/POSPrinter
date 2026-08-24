@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "com.example.sunmiprinter.app-mergeDebugResources-35:/layout/activity_main.xml",
+        "source": "com.example.sunmiprinter.app-main-38:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.example.sunmiprinter.app-mergeDebugResources-35:/layout/dialog_rich_text.xml",
+        "source": "com.example.sunmiprinter.app-main-38:/layout/dialog_rich_text.xml"
+    },
+    {
+        "merged": "com.example.sunmiprinter.app-mergeDebugResources-35:/layout/dialog_image_adjust.xml",
+        "source": "com.example.sunmiprinter.app-main-38:/layout/dialog_image_adjust.xml"
+    }
+]

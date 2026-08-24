@@ -1,0 +1,35 @@
+R_DEF: Internal format may change without notice
+local
+id adjustPreviewImage
+id alignCenterRadio
+id alignLeftRadio
+id alignRightRadio
+id alignmentRadioGroup
+id boldCheckBox
+id brightnessLabel
+id brightnessSeekBar
+id fontLargeRadio
+id fontMediumRadio
+id fontSizeRadioGroup
+id fontSmallRadio
+id fontXLargeRadio
+id pickPhotoButton
+id pickVideoButton
+id previewImage
+id printTextButton
+id progressText
+id richTextInput
+id scaleLabel
+id scaleSeekBar
+id statusText
+id textAlignCenterRadio
+id textAlignLeftRadio
+id textAlignRightRadio
+id textAlignmentRadioGroup
+layout activity_main
+layout dialog_image_adjust
+layout dialog_rich_text
+mipmap ic_launcher
+mipmap ic_launcher_round
+string app_name
+style Theme.SunmiPrinter

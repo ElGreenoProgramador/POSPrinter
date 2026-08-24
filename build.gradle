@@ -1,0 +1,32 @@
+// Top-level build file
+buildscript {
+    ext.kotlin_version = "1.9.22"
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        // 8.2.2 has a known race-condition bug under parallel Gradle execution
+        // ("Cannot mutate the dependencies of configuration ... after the
+        // configuration was resolved"), triggered when dataBinding/viewBinding
+        // merge tasks and resource-processing tasks resolve the same
+        // configuration concurrently. 8.3.2 fixes it. If you can't upgrade,
+        // the org.gradle.parallel=false workaround in gradle.properties avoids it.
+        classpath "com.android.tools.build:gradle:8.3.2"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        // Sunmi's own maven repo, hosts com.sunmi:printerlibrary
+        maven { url 'https://developer.sunmi.com/repository/maven-open/' }
+        maven { url 'https://jitpack.io' } // fallback mirrors of the SDK
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

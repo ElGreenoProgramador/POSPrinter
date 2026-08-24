@@ -1,0 +1,158 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.example.sunmiprinter"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="23"
+9        android:targetSdkVersion="34" />
+10
+11    <!--
+12         Sunmi's inner printer service is exposed by the Sunmi system app (woyou.aidlservice.jiuiv5).
+13         No special permission is required to bind to it on Sunmi hardware, but READ_MEDIA / storage
+14         permissions are needed so the user can pick a photo or video to print.
+15    -->
+16    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+16-->/mnt/F2A82985A8294985/Projects/SunmiPhotoPrinter3/app/src/main/AndroidManifest.xml:7:5-76
+16-->/mnt/F2A82985A8294985/Projects/SunmiPhotoPrinter3/app/src/main/AndroidManifest.xml:7:22-73
+17    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+17-->/mnt/F2A82985A8294985/Projects/SunmiPhotoPrinter3/app/src/main/AndroidManifest.xml:8:5-75
+17-->/mnt/F2A82985A8294985/Projects/SunmiPhotoPrinter3/app/src/main/AndroidManifest.xml:8:22-72
+18    <uses-permission
+18-->/mnt/F2A82985A8294985/Projects/SunmiPhotoPrinter3/app/src/main/AndroidManifest.xml:9:5-10:38
+19        android:name="android.permission.READ_EXTERNAL_STORAGE"
+19-->/mnt/F2A82985A8294985/Projects/SunmiPhotoPrinter3/app/src/main/AndroidManifest.xml:9:22-77
+20        android:maxSdkVersion="32" />
+20-->/mnt/F2A82985A8294985/Projects/SunmiPhotoPrinter3/app/src/main/AndroidManifest.xml:10:9-35
+21
+22    <!--
+23         Declares that this app talks to the Sunmi printer service (helps some Sunmi OS builds
+24         surface the binding correctly; harmless on non-Sunmi devices, where the app will just
+25         report "no printer found").
+26    -->
+27    <queries>
+27-->/mnt/F2A82985A8294985/Projects/SunmiPhotoPrinter3/app/src/main/AndroidManifest.xml:15:5-17:15
+28        <package android:name="woyou.aidlservice.jiuiv5" />
+28-->/mnt/F2A82985A8294985/Projects/SunmiPhotoPrinter3/app/src/main/AndroidManifest.xml:16:9-60
+28-->/mnt/F2A82985A8294985/Projects/SunmiPhotoPrinter3/app/src/main/AndroidManifest.xml:16:18-57
+29    </queries>
+30
+31    <permission
+31-->[androidx.core:core:1.13.1] /home/elgreeno/.gradle/caches/transforms-3/2b4be6e09083a7d72b61eef0d52698c1/transformed/core-1.13.1/AndroidManifest.xml:22:5-24:47
+32        android:name="com.example.sunmiprinter.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+32-->[androidx.core:core:1.13.1] /home/elgreeno/.gradle/caches/transforms-3/2b4be6e09083a7d72b61eef0d52698c1/transformed/core-1.13.1/AndroidManifest.xml:23:9-81
+33        android:protectionLevel="signature" />
+33-->[androidx.core:core:1.13.1] /home/elgreeno/.gradle/caches/transforms-3/2b4be6e09083a7d72b61eef0d52698c1/transformed/core-1.13.1/AndroidManifest.xml:24:9-44
+34
+35    <uses-permission android:name="com.example.sunmiprinter.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+35-->[androidx.core:core:1.13.1] /home/elgreeno/.gradle/caches/transforms-3/2b4be6e09083a7d72b61eef0d52698c1/transformed/core-1.13.1/AndroidManifest.xml:26:5-97
+35-->[androidx.core:core:1.13.1] /home/elgreeno/.gradle/caches/transforms-3/2b4be6e09083a7d72b61eef0d52698c1/transformed/core-1.13.1/AndroidManifest.xml:26:22-94
+36
+37    <application
+37-->/mnt/F2A82985A8294985/Projects/SunmiPhotoPrinter3/app/src/main/AndroidManifest.xml:19:5-36:19
+38        android:allowBackup="true"
+38-->/mnt/F2A82985A8294985/Projects/SunmiPhotoPrinter3/app/src/main/AndroidManifest.xml:20:9-35
+39        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+39-->[androidx.core:core:1.13.1] /home/elgreeno/.gradle/caches/transforms-3/2b4be6e09083a7d72b61eef0d52698c1/transformed/core-1.13.1/AndroidManifest.xml:28:18-86
+40        android:debuggable="true"
+41        android:extractNativeLibs="false"
+42        android:icon="@mipmap/ic_launcher"
+42-->/mnt/F2A82985A8294985/Projects/SunmiPhotoPrinter3/app/src/main/AndroidManifest.xml:21:9-43
+43        android:label="@string/app_name"
+43-->/mnt/F2A82985A8294985/Projects/SunmiPhotoPrinter3/app/src/main/AndroidManifest.xml:23:9-41
+44        android:roundIcon="@mipmap/ic_launcher_round"
+44-->/mnt/F2A82985A8294985/Projects/SunmiPhotoPrinter3/app/src/main/AndroidManifest.xml:22:9-54
+45        android:supportsRtl="true"
+45-->/mnt/F2A82985A8294985/Projects/SunmiPhotoPrinter3/app/src/main/AndroidManifest.xml:25:9-35
+46        android:testOnly="true"
+47        android:theme="@style/Theme.SunmiPrinter" >
+47-->/mnt/F2A82985A8294985/Projects/SunmiPhotoPrinter3/app/src/main/AndroidManifest.xml:24:9-50
+48        <activity
+48-->/mnt/F2A82985A8294985/Projects/SunmiPhotoPrinter3/app/src/main/AndroidManifest.xml:27:9-35:20
+49            android:name="com.example.sunmiprinter.MainActivity"
+49-->/mnt/F2A82985A8294985/Projects/SunmiPhotoPrinter3/app/src/main/AndroidManifest.xml:28:13-41
+50            android:exported="true"
+50-->/mnt/F2A82985A8294985/Projects/SunmiPhotoPrinter3/app/src/main/AndroidManifest.xml:29:13-36
+51            android:screenOrientation="portrait" >
+51-->/mnt/F2A82985A8294985/Projects/SunmiPhotoPrinter3/app/src/main/AndroidManifest.xml:30:13-49
+52            <intent-filter>
+52-->/mnt/F2A82985A8294985/Projects/SunmiPhotoPrinter3/app/src/main/AndroidManifest.xml:31:13-34:29
+53                <action android:name="android.intent.action.MAIN" />
+53-->/mnt/F2A82985A8294985/Projects/SunmiPhotoPrinter3/app/src/main/AndroidManifest.xml:32:17-69
+53-->/mnt/F2A82985A8294985/Projects/SunmiPhotoPrinter3/app/src/main/AndroidManifest.xml:32:25-66
+54
+55                <category android:name="android.intent.category.LAUNCHER" />
+55-->/mnt/F2A82985A8294985/Projects/SunmiPhotoPrinter3/app/src/main/AndroidManifest.xml:33:17-77
+55-->/mnt/F2A82985A8294985/Projects/SunmiPhotoPrinter3/app/src/main/AndroidManifest.xml:33:27-74
+56            </intent-filter>
+57        </activity>
+58
+59        <provider
+59-->[androidx.emoji2:emoji2:1.3.0] /home/elgreeno/.gradle/caches/transforms-3/45e76078d89abb74520bfae92800a3e0/transformed/emoji2-1.3.0/AndroidManifest.xml:24:9-32:20
+60            android:name="androidx.startup.InitializationProvider"
+60-->[androidx.emoji2:emoji2:1.3.0] /home/elgreeno/.gradle/caches/transforms-3/45e76078d89abb74520bfae92800a3e0/transformed/emoji2-1.3.0/AndroidManifest.xml:25:13-67
+61            android:authorities="com.example.sunmiprinter.androidx-startup"
+61-->[androidx.emoji2:emoji2:1.3.0] /home/elgreeno/.gradle/caches/transforms-3/45e76078d89abb74520bfae92800a3e0/transformed/emoji2-1.3.0/AndroidManifest.xml:26:13-68
+62            android:exported="false" >
+62-->[androidx.emoji2:emoji2:1.3.0] /home/elgreeno/.gradle/caches/transforms-3/45e76078d89abb74520bfae92800a3e0/transformed/emoji2-1.3.0/AndroidManifest.xml:27:13-37
+63            <meta-data
+63-->[androidx.emoji2:emoji2:1.3.0] /home/elgreeno/.gradle/caches/transforms-3/45e76078d89abb74520bfae92800a3e0/transformed/emoji2-1.3.0/AndroidManifest.xml:29:13-31:52
+64                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+64-->[androidx.emoji2:emoji2:1.3.0] /home/elgreeno/.gradle/caches/transforms-3/45e76078d89abb74520bfae92800a3e0/transformed/emoji2-1.3.0/AndroidManifest.xml:30:17-75
+65                android:value="androidx.startup" />
+65-->[androidx.emoji2:emoji2:1.3.0] /home/elgreeno/.gradle/caches/transforms-3/45e76078d89abb74520bfae92800a3e0/transformed/emoji2-1.3.0/AndroidManifest.xml:31:17-49
+66            <meta-data
+66-->[androidx.lifecycle:lifecycle-process:2.6.2] /home/elgreeno/.gradle/caches/transforms-3/467df81977f2a2697e59813f7e0df38d/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:29:13-31:52
+67                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+67-->[androidx.lifecycle:lifecycle-process:2.6.2] /home/elgreeno/.gradle/caches/transforms-3/467df81977f2a2697e59813f7e0df38d/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:30:17-78
+68                android:value="androidx.startup" />
+68-->[androidx.lifecycle:lifecycle-process:2.6.2] /home/elgreeno/.gradle/caches/transforms-3/467df81977f2a2697e59813f7e0df38d/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:31:17-49
+69            <meta-data
+69-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/elgreeno/.gradle/caches/transforms-3/d5695ff5fa5b2844b07b9e5b9428da86/transformed/profileinstaller-1.3.1/AndroidManifest.xml:29:13-31:52
+70                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+70-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/elgreeno/.gradle/caches/transforms-3/d5695ff5fa5b2844b07b9e5b9428da86/transformed/profileinstaller-1.3.1/AndroidManifest.xml:30:17-85
+71                android:value="androidx.startup" />
+71-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/elgreeno/.gradle/caches/transforms-3/d5695ff5fa5b2844b07b9e5b9428da86/transformed/profileinstaller-1.3.1/AndroidManifest.xml:31:17-49
+72        </provider>
+73
+74        <receiver
+74-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/elgreeno/.gradle/caches/transforms-3/d5695ff5fa5b2844b07b9e5b9428da86/transformed/profileinstaller-1.3.1/AndroidManifest.xml:34:9-52:20
+75            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+75-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/elgreeno/.gradle/caches/transforms-3/d5695ff5fa5b2844b07b9e5b9428da86/transformed/profileinstaller-1.3.1/AndroidManifest.xml:35:13-76
+76            android:directBootAware="false"
+76-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/elgreeno/.gradle/caches/transforms-3/d5695ff5fa5b2844b07b9e5b9428da86/transformed/profileinstaller-1.3.1/AndroidManifest.xml:36:13-44
+77            android:enabled="true"
+77-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/elgreeno/.gradle/caches/transforms-3/d5695ff5fa5b2844b07b9e5b9428da86/transformed/profileinstaller-1.3.1/AndroidManifest.xml:37:13-35
+78            android:exported="true"
+78-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/elgreeno/.gradle/caches/transforms-3/d5695ff5fa5b2844b07b9e5b9428da86/transformed/profileinstaller-1.3.1/AndroidManifest.xml:38:13-36
+79            android:permission="android.permission.DUMP" >
+79-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/elgreeno/.gradle/caches/transforms-3/d5695ff5fa5b2844b07b9e5b9428da86/transformed/profileinstaller-1.3.1/AndroidManifest.xml:39:13-57
+80            <intent-filter>
+80-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/elgreeno/.gradle/caches/transforms-3/d5695ff5fa5b2844b07b9e5b9428da86/transformed/profileinstaller-1.3.1/AndroidManifest.xml:40:13-42:29
+81                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+81-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/elgreeno/.gradle/caches/transforms-3/d5695ff5fa5b2844b07b9e5b9428da86/transformed/profileinstaller-1.3.1/AndroidManifest.xml:41:17-91
+81-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/elgreeno/.gradle/caches/transforms-3/d5695ff5fa5b2844b07b9e5b9428da86/transformed/profileinstaller-1.3.1/AndroidManifest.xml:41:25-88
+82            </intent-filter>
+83            <intent-filter>
+83-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/elgreeno/.gradle/caches/transforms-3/d5695ff5fa5b2844b07b9e5b9428da86/transformed/profileinstaller-1.3.1/AndroidManifest.xml:43:13-45:29
+84                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+84-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/elgreeno/.gradle/caches/transforms-3/d5695ff5fa5b2844b07b9e5b9428da86/transformed/profileinstaller-1.3.1/AndroidManifest.xml:44:17-85
+84-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/elgreeno/.gradle/caches/transforms-3/d5695ff5fa5b2844b07b9e5b9428da86/transformed/profileinstaller-1.3.1/AndroidManifest.xml:44:25-82
+85            </intent-filter>
+86            <intent-filter>
+86-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/elgreeno/.gradle/caches/transforms-3/d5695ff5fa5b2844b07b9e5b9428da86/transformed/profileinstaller-1.3.1/AndroidManifest.xml:46:13-48:29
+87                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+87-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/elgreeno/.gradle/caches/transforms-3/d5695ff5fa5b2844b07b9e5b9428da86/transformed/profileinstaller-1.3.1/AndroidManifest.xml:47:17-88
+87-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/elgreeno/.gradle/caches/transforms-3/d5695ff5fa5b2844b07b9e5b9428da86/transformed/profileinstaller-1.3.1/AndroidManifest.xml:47:25-85
+88            </intent-filter>
+89            <intent-filter>
+89-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/elgreeno/.gradle/caches/transforms-3/d5695ff5fa5b2844b07b9e5b9428da86/transformed/profileinstaller-1.3.1/AndroidManifest.xml:49:13-51:29
+90                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+90-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/elgreeno/.gradle/caches/transforms-3/d5695ff5fa5b2844b07b9e5b9428da86/transformed/profileinstaller-1.3.1/AndroidManifest.xml:50:17-95
+90-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/elgreeno/.gradle/caches/transforms-3/d5695ff5fa5b2844b07b9e5b9428da86/transformed/profileinstaller-1.3.1/AndroidManifest.xml:50:25-92
+91            </intent-filter>
+92        </receiver>
+93    </application>
+94
+95</manifest>
