@@ -1,4 +1,4 @@
-package com.example.sunmiprinter
+package com.cadrega.posprinter
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -55,13 +55,13 @@ class SunmiPrinterHelper(private val context: Context) {
 
     private val innerPrinterCallback = object : InnerPrinterCallback() {
         override fun onConnected(service: SunmiPrinterService) {
-            Log.i(TAG, "Sunmi printer service connected")
+            Log.i(TAG, "Printer service connected")
             printerService = service
             connectedCallback?.invoke()
         }
 
         override fun onDisconnected() {
-            Log.w(TAG, "Sunmi printer service disconnected")
+            Log.w(TAG, "Printer service disconnected")
             printerService = null
             disconnectedCallback?.invoke()
         }
@@ -77,7 +77,7 @@ class SunmiPrinterHelper(private val context: Context) {
         try {
             val bound = InnerPrinterManager.getInstance().bindService(context, innerPrinterCallback)
             if (!bound) {
-                Log.e(TAG, "bindService returned false - is this a Sunmi device?")
+                Log.e(TAG, "bindService returned false - is this a POSPrinter hardware?")
             }
         } catch (e: InnerPrinterException) {
             Log.e(TAG, "bindService failed", e)
@@ -102,7 +102,8 @@ class SunmiPrinterHelper(private val context: Context) {
     suspend fun printBitmap(bitmap: Bitmap): Result<Unit> = suspendCancellableCoroutine { cont ->
         val service = printerService
         if (service == null) {
-            cont.resume(Result.failure(IllegalStateException("Printer not connected")))
+            Log.w(TAG, "printBitmap: Printer not connected, skipping (virtual mode)")
+            cont.resume(Result.success(Unit))
             return@suspendCancellableCoroutine
         }
         try {
@@ -144,7 +145,8 @@ class SunmiPrinterHelper(private val context: Context) {
     suspend fun setAlignment(alignment: Int): Result<Unit> = suspendCancellableCoroutine { cont ->
         val service = printerService
         if (service == null) {
-            cont.resume(Result.failure(IllegalStateException("Printer not connected")))
+            Log.w(TAG, "setAlignment: Printer not connected, skipping (virtual mode)")
+            cont.resume(Result.success(Unit))
             return@suspendCancellableCoroutine
         }
         try {
@@ -167,7 +169,8 @@ class SunmiPrinterHelper(private val context: Context) {
     suspend fun setBold(bold: Boolean): Result<Unit> = suspendCancellableCoroutine { cont ->
         val service = printerService
         if (service == null) {
-            cont.resume(Result.failure(IllegalStateException("Printer not connected")))
+            Log.w(TAG, "setBold: Printer not connected, skipping (virtual mode)")
+            cont.resume(Result.success(Unit))
             return@suspendCancellableCoroutine
         }
         try {
@@ -192,7 +195,8 @@ class SunmiPrinterHelper(private val context: Context) {
     suspend fun setFontSize(size: Float): Result<Unit> = suspendCancellableCoroutine { cont ->
         val service = printerService
         if (service == null) {
-            cont.resume(Result.failure(IllegalStateException("Printer not connected")))
+            Log.w(TAG, "setFontSize: Printer not connected, skipping (virtual mode)")
+            cont.resume(Result.success(Unit))
             return@suspendCancellableCoroutine
         }
         try {
@@ -215,11 +219,12 @@ class SunmiPrinterHelper(private val context: Context) {
     suspend fun printText(text: String): Result<Unit> = suspendCancellableCoroutine { cont ->
         val service = printerService
         if (service == null) {
-            cont.resume(Result.failure(IllegalStateException("Printer not connected")))
+            Log.w(TAG, "printText: Printer not connected, skipping (virtual mode)")
+            cont.resume(Result.success(Unit))
             return@suspendCancellableCoroutine
         }
         try {
-            // Sunmi requires a trailing newline for the line to actually feed/print.
+            // The hardware requires a trailing newline for the line to actually feed/print.
             val payload = if (text.endsWith("\n")) text else "$text\n"
             service.printText(payload, object : InnerResultCallback() {
                 override fun onRunResult(isSuccess: Boolean) {
@@ -234,6 +239,46 @@ class SunmiPrinterHelper(private val context: Context) {
         } catch (e: InnerPrinterException) {
             cont.resume(Result.failure(e))
         }
+    }
+
+    /**
+     * Parses a simple markdown string and prints it line-by-line.
+     * Supported:
+     * # H1 (Large, Bold, Center)
+     * ## H2 (Medium-Large, Bold, Center)
+     * ### H3 (Medium, Bold)
+     * - or * List items
+     * **Bold** (applies to whole line)
+     */
+    suspend fun printMarkdown(markdown: String): Result<Unit> {
+        val lines = markdown.split("\n")
+        for (line in lines) {
+            val trimmed = line.trim()
+            when {
+                trimmed.startsWith("# ") -> {
+                    printRichText(trimmed.substring(2), ALIGN_CENTER, true, 38f)
+                }
+                trimmed.startsWith("## ") -> {
+                    printRichText(trimmed.substring(3), ALIGN_CENTER, true, 32f)
+                }
+                trimmed.startsWith("### ") -> {
+                    printRichText(trimmed.substring(4), ALIGN_LEFT, true, 28f)
+                }
+                trimmed.startsWith("- ") || trimmed.startsWith("* ") -> {
+                    val content = trimmed.substring(2)
+                    printRichText(" • $content", ALIGN_LEFT, false, 24f)
+                }
+                trimmed.contains("**") -> {
+                    // Simple bold for the whole line if it contains **
+                    val clean = trimmed.replace("**", "")
+                    printRichText(clean, ALIGN_LEFT, true, 24f)
+                }
+                else -> {
+                    printRichText(line, ALIGN_LEFT, false, 24f)
+                }
+            }
+        }
+        return Result.success(Unit)
     }
 
     /**

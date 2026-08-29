@@ -1,3 +1,13 @@
 <resources>
-    <string name="app_name">Sunmi Photo Printer</string>
+    <string name="app_name">POSPrinter</string>
+    <string name="batch_print">Batch Print</string>
+    <string name="batch_print_desc">Select multiple images to print</string>
+    <string name="print_photo">Print Photo</string>
+    <string name="print_photo_desc">Select and adjust an image</string>
+    <string name="print_video">Print Video</string>
+    <string name="print_video_desc">Extract and print frames</string>
+    <string name="print_text">Print Text</string>
+    <string name="print_text_desc">Custom rich text printing</string>
+    <string name="features">Features</string>
+    <string name="preview">Preview</string>
 </resources>

@@ -8,9 +8,10 @@ def draw_icon(size, round_mask=False):
     img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
 
-    bg_color = (0, 105, 92, 255)   # deep teal, matches Sunmi's hardware-y aesthetic
-    accent = (255, 255, 255, 255)
-    dark = (0, 77, 64, 255)
+    bg_color = (103, 80, 164, 255)   # M3 Primary Purple (#6750A4)
+    paper_color = (234, 221, 255, 255) # M3 Primary Container (#EADDFF)
+    body_color = (255, 255, 255, 255) # White
+    slot_color = (103, 80, 164, 255) # Same as background
 
     pad = int(size * 0.06)
     # Background shape: rounded square (or circle for round icon)
@@ -20,79 +21,28 @@ def draw_icon(size, round_mask=False):
         radius = int(size * 0.18)
         d.rounded_rectangle([pad, pad, size - pad, size - pad], radius=radius, fill=bg_color)
 
-    # Printer body (centered, slightly lower half)
-    body_w = size * 0.56
-    body_h = size * 0.24
-    body_x0 = (size - body_w) / 2
-    body_y0 = size * 0.42
-    d.rounded_rectangle(
-        [body_x0, body_y0, body_x0 + body_w, body_y0 + body_h],
-        radius=size * 0.035, fill=accent
-    )
+    # Minimal Printer Design (Material 3 style)
 
-    # Paper slot (dark line across the printer body)
-    slot_h = size * 0.03
-    d.rectangle(
-        [body_x0 + size * 0.05, body_y0 + size * 0.03,
-         body_x0 + body_w - size * 0.05, body_y0 + size * 0.03 + slot_h],
-        fill=dark
-    )
+    # Paper emerging from slot
+    pw = size * 0.35
+    ph = size * 0.25
+    px0 = (size - pw) / 2
+    py0 = size * 0.25
+    d.rounded_rectangle([px0, py0, px0 + pw, py0 + ph + 10], radius=int(size * 0.02), fill=paper_color)
 
-    # Printed paper strip coming out the top of the printer
-    paper_w = body_w * 0.72
-    paper_x0 = (size - paper_w) / 2
-    paper_top = size * 0.20
-    d.rectangle(
-        [paper_x0, paper_top, paper_x0 + paper_w, body_y0],
-        fill=accent
-    )
-    # Little "photo" square + lines on the paper to suggest an image printout
-    photo_pad = paper_w * 0.14
-    photo_size = paper_w * 0.34
-    photo_x0 = paper_x0 + photo_pad
-    photo_y0 = paper_top + size * 0.03
-    d.rectangle(
-        [photo_x0, photo_y0, photo_x0 + photo_size, photo_y0 + photo_size],
-        outline=dark, width=max(2, int(size * 0.012))
-    )
-    # simple mountain/sun glyph inside the photo square
-    d.ellipse(
-        [photo_x0 + photo_size * 0.14, photo_y0 + photo_size * 0.14,
-         photo_x0 + photo_size * 0.40, photo_y0 + photo_size * 0.40],
-        fill=dark
-    )
-    d.polygon(
-        [
-            (photo_x0 + photo_size * 0.10, photo_y0 + photo_size * 0.85),
-            (photo_x0 + photo_size * 0.45, photo_y0 + photo_size * 0.45),
-            (photo_x0 + photo_size * 0.65, photo_y0 + photo_size * 0.65),
-            (photo_x0 + photo_size * 0.80, photo_y0 + photo_size * 0.50),
-            (photo_x0 + photo_size * 0.92, photo_y0 + photo_size * 0.85),
-        ],
-        fill=dark
-    )
-    # text lines next to the photo square
-    line_x0 = photo_x0 + photo_size + photo_pad * 0.6
-    line_x1 = paper_x0 + paper_w - photo_pad * 0.4
-    line_h = max(2, int(size * 0.02))
-    for i, frac in enumerate([0.18, 0.42, 0.66]):
-        y = photo_y0 + photo_size * frac
-        w = line_x1 - line_x0 if i < 2 else (line_x1 - line_x0) * 0.6
-        d.rectangle([line_x0, y, line_x0 + w, y + line_h], fill=dark)
+    # Printer body
+    bw = size * 0.55
+    bh = size * 0.35
+    bx0 = (size - bw) / 2
+    by0 = size * 0.45
+    d.rounded_rectangle([bx0, by0, bx0 + bw, by0 + bh], radius=int(size * 0.06), fill=body_color)
 
-    # Two little feet on the printer body for a grounded look
-    foot_w = size * 0.05
-    foot_h = size * 0.03
-    d.rectangle(
-        [body_x0 + size * 0.04, body_y0 + body_h,
-         body_x0 + size * 0.04 + foot_w, body_y0 + body_h + foot_h],
-        fill=dark
-    )
-    d.rectangle(
-        [body_x0 + body_w - size * 0.04 - foot_w, body_y0 + body_h,
-         body_x0 + body_w - size * 0.04, body_y0 + body_h + foot_h],
-        fill=dark
-    )
+    # Slot
+    sw = bw * 0.85
+    sh = size * 0.04
+    sx0 = (size - sw) / 2
+    sy0 = by0 + size * 0.04
+    d.rectangle([sx0, sy0, sx0 + sw, sy0 + sh], fill=slot_color)
 
     return img
 
@@ -105,7 +55,8 @@ densities = {
     "mipmap-xxxhdpi": 192,
 }
 
-res_root = "/home/claude/SunmiPhotoPrinter/app/src/main/res"
+# Updated to new project directory
+res_root = "app/src/main/res"
 
 for folder, px in densities.items():
     out_dir = os.path.join(res_root, folder)
@@ -117,4 +68,4 @@ for folder, px in densities.items():
     round_icon = draw_icon(BASE, round_mask=True).resize((px, px), Image.LANCZOS)
     round_icon.save(os.path.join(out_dir, "ic_launcher_round.png"))
 
-print("done")
+print("Icons generated")
