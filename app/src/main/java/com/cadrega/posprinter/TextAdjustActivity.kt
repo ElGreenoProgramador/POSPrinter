@@ -23,7 +23,8 @@ import kotlinx.coroutines.withContext
 class TextAdjustActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityTextAdjustBinding
-    private val printerWidthPx = SunmiPrinterHelper.PRINTER_WIDTH_58MM
+    private lateinit var settingsManager: SettingsManager
+    private var printerWidthPx = SunmiPrinterHelper.PRINTER_WIDTH_58MM
     
     private val pickTextFileLauncher =
         registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.GetContent()) { uri ->
@@ -37,14 +38,26 @@ class TextAdjustActivity : AppCompatActivity() {
         const val RESULT_TEXT = "result_text"
     }
 
+    private var initialText = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityTextAdjustBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val initialText = intent.getStringExtra(EXTRA_TEXT) ?: ""
+        settingsManager = SettingsManager(this)
+        printerWidthPx = settingsManager.printerWidth
+
+        initialText = intent.getStringExtra(EXTRA_TEXT) ?: ""
         binding.textInput.setText(initialText)
 
+        binding.toolbar.inflateMenu(R.menu.menu_adjust)
+        binding.toolbar.setOnMenuItemClickListener {
+            if (it.itemId == R.id.action_undo) {
+                binding.textInput.setText(initialText)
+                true
+            } else false
+        }
         binding.toolbar.setNavigationOnClickListener { finish() }
 
         binding.loadFileButton.setOnClickListener {
@@ -110,9 +123,10 @@ class TextAdjustActivity : AppCompatActivity() {
     }
 
     private fun renderMarkdownPreview(text: String): Bitmap {
+        val scale = settingsManager.fontScale
         val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = Color.BLACK
-            textSize = 24f
+            textSize = 24f * scale
         }
         
         val lines = text.split("\n")
@@ -123,12 +137,12 @@ class TextAdjustActivity : AppCompatActivity() {
         for (line in lines) {
             val trimmed = line.trim()
             val style = when {
-                trimmed.startsWith("# ") -> RenderStyle(trimmed.substring(2), 38f, true, SunmiPrinterHelper.ALIGN_CENTER)
-                trimmed.startsWith("## ") -> RenderStyle(trimmed.substring(3), 32f, true, SunmiPrinterHelper.ALIGN_CENTER)
-                trimmed.startsWith("### ") -> RenderStyle(trimmed.substring(4), 28f, true, SunmiPrinterHelper.ALIGN_LEFT)
-                trimmed.startsWith("- ") || trimmed.startsWith("* ") -> RenderStyle(" • " + trimmed.substring(2), 24f, false, SunmiPrinterHelper.ALIGN_LEFT)
-                trimmed.contains("**") -> RenderStyle(trimmed.replace("**", ""), 24f, true, SunmiPrinterHelper.ALIGN_LEFT)
-                else -> RenderStyle(line, 24f, false, SunmiPrinterHelper.ALIGN_LEFT)
+                trimmed.startsWith("# ") -> RenderStyle(trimmed.substring(2), 38f * scale, true, SunmiPrinterHelper.ALIGN_CENTER)
+                trimmed.startsWith("## ") -> RenderStyle(trimmed.substring(3), 32f * scale, true, SunmiPrinterHelper.ALIGN_CENTER)
+                trimmed.startsWith("### ") -> RenderStyle(trimmed.substring(4), 28f * scale, true, SunmiPrinterHelper.ALIGN_LEFT)
+                trimmed.startsWith("- ") || trimmed.startsWith("* ") -> RenderStyle(" • " + trimmed.substring(2), 24f * scale, false, SunmiPrinterHelper.ALIGN_LEFT)
+                trimmed.contains("**") -> RenderStyle(trimmed.replace("**", ""), 24f * scale, true, SunmiPrinterHelper.ALIGN_LEFT)
+                else -> RenderStyle(line, 24f * scale, false, SunmiPrinterHelper.ALIGN_LEFT)
             }
             
             paint.textSize = style.size

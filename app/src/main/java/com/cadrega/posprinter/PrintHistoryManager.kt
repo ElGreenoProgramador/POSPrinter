@@ -22,6 +22,7 @@ class PrintHistoryManager(private val context: Context) {
 
     private val prefs = context.getSharedPreferences("print_history", Context.MODE_PRIVATE)
     private val historyDir = File(context.filesDir, "history_previews").apply { mkdirs() }
+    private val settingsManager = SettingsManager(context)
 
     fun saveItem(item: PrintHistoryItem, bitmaps: List<Bitmap>) {
         val paths = bitmaps.mapIndexed { index, bitmap ->
@@ -32,8 +33,8 @@ class PrintHistoryManager(private val context: Context) {
         val history = getHistory().toMutableList()
         history.add(0, updatedItem)
         
-        // Keep only last 30 items to save space since we store all bitmaps now
-        val limit = 30
+        // Keep history within limit
+        val limit = settingsManager.historyLimit
         if (history.size > limit) {
             for (i in limit until history.size) {
                 history[i].imagePaths.forEach { File(it).delete() }

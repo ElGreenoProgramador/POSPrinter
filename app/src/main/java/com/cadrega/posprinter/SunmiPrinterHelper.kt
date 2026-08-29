@@ -39,6 +39,8 @@ import kotlin.coroutines.resume
  */
 class SunmiPrinterHelper(private val context: Context) {
 
+    private val settingsManager = SettingsManager(context)
+
     companion object {
         private const val TAG = "SunmiPrinterHelper"
         const val PRINTER_WIDTH_58MM = 384
@@ -91,6 +93,15 @@ class SunmiPrinterHelper(private val context: Context) {
             Log.e(TAG, "unBindService failed", e)
         }
         printerService = null
+    }
+
+    /** Returns the printer model string from the service. */
+    fun getPrinterModel(): String? {
+        return try {
+            printerService?.getPrinterModal()
+        } catch (e: Exception) {
+            null
+        }
     }
 
     /**
@@ -251,30 +262,31 @@ class SunmiPrinterHelper(private val context: Context) {
      * **Bold** (applies to whole line)
      */
     suspend fun printMarkdown(markdown: String): Result<Unit> {
+        val scale = settingsManager.fontScale
         val lines = markdown.split("\n")
         for (line in lines) {
             val trimmed = line.trim()
             when {
                 trimmed.startsWith("# ") -> {
-                    printRichText(trimmed.substring(2), ALIGN_CENTER, true, 38f)
+                    printRichText(trimmed.substring(2), ALIGN_CENTER, true, 38f * scale)
                 }
                 trimmed.startsWith("## ") -> {
-                    printRichText(trimmed.substring(3), ALIGN_CENTER, true, 32f)
+                    printRichText(trimmed.substring(3), ALIGN_CENTER, true, 32f * scale)
                 }
                 trimmed.startsWith("### ") -> {
-                    printRichText(trimmed.substring(4), ALIGN_LEFT, true, 28f)
+                    printRichText(trimmed.substring(4), ALIGN_LEFT, true, 28f * scale)
                 }
                 trimmed.startsWith("- ") || trimmed.startsWith("* ") -> {
                     val content = trimmed.substring(2)
-                    printRichText(" • $content", ALIGN_LEFT, false, 24f)
+                    printRichText(" • $content", ALIGN_LEFT, false, 24f * scale)
                 }
                 trimmed.contains("**") -> {
                     // Simple bold for the whole line if it contains **
                     val clean = trimmed.replace("**", "")
-                    printRichText(clean, ALIGN_LEFT, true, 24f)
+                    printRichText(clean, ALIGN_LEFT, true, 24f * scale)
                 }
                 else -> {
-                    printRichText(line, ALIGN_LEFT, false, 24f)
+                    printRichText(line, ALIGN_LEFT, false, 24f * scale)
                 }
             }
         }

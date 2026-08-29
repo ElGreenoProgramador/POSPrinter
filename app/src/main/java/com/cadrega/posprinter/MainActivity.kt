@@ -26,7 +26,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
 
-data class ImageAdjustSettings(val scalePercent: Int, val brightness: Int, val alignment: Int)
+data class ImageAdjustSettings(
+    val scalePercent: Int, 
+    val brightness: Int, 
+    val alignment: Int,
+    val gamma: Float = 1.0f,
+    val algorithm: PrintImageUtils.DitherAlgorithm = PrintImageUtils.DitherAlgorithm.FloydSteinberg
+)
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,25 +41,35 @@ class MainActivity : AppCompatActivity() {
     private lateinit var frameExtractor: VideoFrameExtractor
     private lateinit var historyManager: PrintHistoryManager
     private lateinit var historyAdapter: PrintHistoryAdapter
+    private lateinit var settingsManager: SettingsManager
     private var lastSelectedVideoUri: Uri? = null
 
-    // Most POSPrinter units use 58mm paper -> ~384px wide print head.
-    // Change to SunmiPrinterHelper.PRINTER_WIDTH_80MM if your unit takes 80mm paper.
-    private val printerWidthPx = SunmiPrinterHelper.PRINTER_WIDTH_58MM
+    // Printer width is now dynamic from SettingsManager
+    private var printerWidthPx = SunmiPrinterHelper.PRINTER_WIDTH_58MM
 
     /** User's chosen scale (% of printer width), brightness (-100..100), and alignment for an image/frame print. */
 
     private var adjustResultCont: CancellableContinuation<List<ImageAdjustSettings>?>? = null
+    private var lastAdjustData: Intent? = null
     private val adjustLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        lastAdjustData = result.data
         val settingsList = if (result.resultCode == RESULT_OK) {
             val data = result.data
             if (data != null) {
                 val scales = data.getIntegerArrayListExtra(ImageAdjustActivity.RESULT_SCALES) ?: emptyList<Int>()
                 val brightnesses = data.getIntegerArrayListExtra(ImageAdjustActivity.RESULT_BRIGHTNESSES) ?: emptyList<Int>()
                 val alignments = data.getIntegerArrayListExtra(ImageAdjustActivity.RESULT_ALIGNMENTS) ?: emptyList<Int>()
+                val gammas = data.getFloatArrayExtra(ImageAdjustActivity.RESULT_GAMMAS)
+                val algorithms = data.getIntArrayExtra(ImageAdjustActivity.RESULT_ALGORITHMS)
                 
                 scales.indices.map { i ->
-                    ImageAdjustSettings(scales[i], brightnesses[i], alignments[i])
+                    ImageAdjustSettings(
+                        scales[i], 
+                        brightnesses[i], 
+                        alignments[i],
+                        gammas?.getOrNull(i) ?: 1.0f,
+                        PrintImageUtils.DitherAlgorithm.entries[algorithms?.getOrNull(i) ?: 0]
+                    )
                 }
             } else emptyList()
         } else null
@@ -108,7 +124,22 @@ class MainActivity : AppCompatActivity() {
 
         printer = SunmiPrinterHelper(this)
         frameExtractor = VideoFrameExtractor(this)
+        settingsManager = SettingsManager(this)
+        printerWidthPx = settingsManager.printerWidth
+
         historyManager = PrintHistoryManager(this)
+        
+        binding.toolbar.inflateMenu(R.menu.menu_main)
+        binding.toolbar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_settings -> {
+                    startActivity(Intent(this, SettingsActivity::class.java))
+                    true
+                }
+                else -> false
+            }
+        }
+
         historyAdapter = PrintHistoryAdapter(historyManager) { item, status ->
             when (status) {
                 is PrintHistoryManager.RelaunchStatus.Ready -> relaunchPrintJob(item)
@@ -167,6 +198,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (::settingsManager.isInitialized) {
+            printerWidthPx = settingsManager.printerWidth
+            refreshHistory()
+        }
+    }
+
     override fun onDestroy() {
         printer.disconnect()
         super.onDestroy()
@@ -198,14 +237,15 @@ class MainActivity : AppCompatActivity() {
                     binding.progressCard.visibility = android.view.View.VISIBLE
                     val prepared = withContext(Dispatchers.Default) {
                         PrintImageUtils.prepareForPrint(
-                            bitmap, printerWidthPx, settings.scalePercent, settings.brightness
+                            bitmap, printerWidthPx, settings.scalePercent, settings.brightness,
+                            settings.gamma, settings.algorithm
                         )
                     }
 
                     binding.progressText.text = "Printing..."
                     printer.setAlignment(settings.alignment)
                     val result = printer.printBitmap(prepared)
-                    printer.feedPaper(4)
+                    printer.feedPaper(settingsManager.feedLines)
                     binding.progressCard.visibility = android.view.View.GONE
                     if (result.isSuccess) {
                         binding.progressText.text = "Done"
@@ -258,7 +298,8 @@ class MainActivity : AppCompatActivity() {
 
                 val prepared = withContext(Dispatchers.Default) {
                     PrintImageUtils.prepareForPrint(
-                        bitmap, printerWidthPx, settings.scalePercent, settings.brightness
+                        bitmap, printerWidthPx, settings.scalePercent, settings.brightness,
+                        settings.gamma, settings.algorithm
                     )
                 }
                 lastPreparedBitmaps.add(prepared)
@@ -267,11 +308,12 @@ class MainActivity : AppCompatActivity() {
                 val result = printer.printBitmap(prepared)
                 if (result.isSuccess) {
                     printedCount++
-                    printer.feedPaper(2)
+                    val gapMm = lastAdjustData?.getIntExtra(ImageAdjustActivity.RESULT_GAP_MM, 2) ?: 2
+                    printer.feedPaper(gapMm)
                 }
             }
             
-            printer.feedPaper(4)
+            printer.feedPaper(settingsManager.feedLines)
             binding.progressCard.visibility = android.view.View.GONE
             if (printedCount > 0) {
                 binding.progressText.text = "Done - printed $printedCount/${bitmaps.size} image(s)"
@@ -389,7 +431,8 @@ class MainActivity : AppCompatActivity() {
 
                 val prepared = withContext(Dispatchers.Default) {
                     PrintImageUtils.prepareForPrint(
-                        bitmap, printerWidthPx, settings.scalePercent, settings.brightness
+                        bitmap, printerWidthPx, settings.scalePercent, settings.brightness,
+                        settings.gamma, settings.algorithm
                     )
                 }
                 lastPreparedBitmaps.add(prepared)
@@ -398,11 +441,12 @@ class MainActivity : AppCompatActivity() {
                 val result = printer.printBitmap(prepared)
                 if (result.isSuccess) {
                     printedCount++
-                    printer.feedPaper(2)
+                    val gapMm = lastAdjustData?.getIntExtra(ImageAdjustActivity.RESULT_GAP_MM, 2) ?: 2
+                    printer.feedPaper(gapMm)
                 }
             }
 
-            printer.feedPaper(4)
+            printer.feedPaper(settingsManager.feedLines)
             binding.progressCard.visibility = android.view.View.GONE
             if (printedCount > 0) {
                 binding.progressText.text = "Done - printed $printedCount/${bitmaps.size} frame(s)"
@@ -430,7 +474,7 @@ class MainActivity : AppCompatActivity() {
             binding.progressText.text = "Printing Markdown..."
             binding.progressCard.visibility = android.view.View.VISIBLE
             val result = printer.printMarkdown(text)
-            printer.feedPaper(3)
+            printer.feedPaper(settingsManager.feedLines)
             binding.progressCard.visibility = android.view.View.GONE
             if (result.isSuccess) {
                 binding.progressText.text = "Done"
@@ -452,7 +496,7 @@ class MainActivity : AppCompatActivity() {
             binding.progressText.text = "Printing text..."
             binding.progressCard.visibility = android.view.View.VISIBLE
             val result = printer.printRichText(text, alignment, bold, fontSize)
-            printer.feedPaper(3)
+            printer.feedPaper(settingsManager.feedLines)
             binding.progressCard.visibility = android.view.View.GONE
             if (result.isSuccess) {
                 binding.progressText.text = "Done"
@@ -503,6 +547,7 @@ class MainActivity : AppCompatActivity() {
 
                     // Open history preview - now with "Adjust Parameters" possibility
                     val settingsList = showImageAdjustDialogs(bitmaps, isReadOnly = true) ?: return@launch
+                    val data = lastAdjustData
 
                     if (!printer.isConnected) {
                         toast("Printer not connected - showing preview only")
@@ -512,23 +557,28 @@ class MainActivity : AppCompatActivity() {
                     binding.progressText.text = "Printing ${item.type}..."
 
                     try {
+                        val gapMm = data?.getIntExtra(ImageAdjustActivity.RESULT_GAP_MM, 2) ?: 2
+                        
                         for ((index, bitmap) in bitmaps.withIndex()) {
                             val settings = settingsList[index]
                             binding.progressText.text = "Printing item ${index + 1}/${bitmaps.size}..."
                             
                             val prepared = withContext(Dispatchers.Default) {
                                 PrintImageUtils.prepareForPrint(
-                                    bitmap, printerWidthPx, settings.scalePercent, settings.brightness
+                                    bitmap, printerWidthPx, settings.scalePercent, settings.brightness,
+                                    settings.gamma, settings.algorithm
                                 )
                             }
                             
                             printer.setAlignment(settings.alignment)
                             val result = printer.printBitmap(prepared)
                             if (result.isSuccess) {
-                                printer.feedPaper(2)
+                                if (index < bitmaps.size - 1) {
+                                    printer.feedPaper(gapMm)
+                                }
                             }
                         }
-                        printer.feedPaper(4)
+                        printer.feedPaper(settingsManager.feedLines)
                         binding.progressText.text = "Done"
                     } catch (e: Exception) {
                         Log.e("MainActivity", "Relaunch failed", e)

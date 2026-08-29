@@ -152,6 +152,24 @@
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="16dp" />
 
+                <LinearLayout
+                    android:id="@+id/batchControlsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp"
+                    android:visibility="gone">
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/customSettingsSwitch"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Custom settings per frame" />
+
+                </LinearLayout>
+
                 <TextView
                     android:id="@+id/scaleLabel"
                     android:layout_width="match_parent"
@@ -182,6 +200,59 @@
                     android:max="200"
                     android:progress="100"
                     android:paddingVertical="12dp" />
+
+                <TextView
+                    android:id="@+id/gammaLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Gamma: 1.00"
+                    style="@style/TextAppearance.Material3.TitleSmall"
+                    android:layout_marginTop="12dp" />
+
+                <SeekBar
+                    android:id="@+id/gammaSeekBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:max="200"
+                    android:progress="100"
+                    android:paddingVertical="12dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Dithering Filter"
+                    style="@style/TextAppearance.Material3.TitleSmall"
+                    android:layout_marginTop="12dp" />
+
+                <Spinner
+                    android:id="@+id/ditherSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp" />
+
+                <LinearLayout
+                    android:id="@+id/gapContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/gapLabel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Frame Gap: 2 mm"
+                        style="@style/TextAppearance.Material3.TitleSmall"
+                        android:layout_marginTop="12dp" />
+
+                    <SeekBar
+                        android:id="@+id/gapSeekBar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="10"
+                        android:progress="2"
+                        android:paddingVertical="12dp" />
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="match_parent"
