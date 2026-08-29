@@ -3,7 +3,7 @@
 Prints arbitrary photos, and videos frame-by-frame, on a Sunmi V2's built-in
 thermal printer.
 
-## Sunmi printing API — what I found
+## Sunmi printing API — what has been found by AI
 
 Sunmi's printer is accessed through their **official inner-printer SDK**
 (`com.sunmi.peripheral.printer`), not a generic Android print API. Three ways

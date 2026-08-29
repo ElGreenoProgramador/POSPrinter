@@ -196,6 +196,9 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, TextAdjustActivity::class.java)
             textLauncher.launch(intent)
         }
+        binding.cardCompositeJob.setOnClickListener {
+            startActivity(Intent(this, CompositeJobActivity::class.java))
+        }
     }
 
     override fun onResume() {
@@ -284,7 +287,7 @@ class MainActivity : AppCompatActivity() {
                 return@launch
             }
 
-            val settingsList = showImageAdjustDialogs(bitmaps) ?: run {
+            val settingsList = showImageAdjustDialogs(bitmaps, featureType = ImageAdjustActivity.FEATURE_TYPE_BATCH) ?: run {
                 binding.progressBar.visibility = android.view.View.GONE
                 return@launch
             }
@@ -383,16 +386,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun showImageAdjustDialog(preview: Bitmap): ImageAdjustSettings? {
-        val list = showImageAdjustDialogs(listOf(preview))
+        val list = showImageAdjustDialogs(listOf(preview), featureType = ImageAdjustActivity.FEATURE_TYPE_PHOTO)
         return list?.firstOrNull()
     }
 
-    private suspend fun showImageAdjustDialogs(previews: List<Bitmap>, isReadOnly: Boolean = false): List<ImageAdjustSettings>? =
+    private suspend fun showImageAdjustDialogs(
+        previews: List<Bitmap>, 
+        isReadOnly: Boolean = false,
+        featureType: String = ImageAdjustActivity.FEATURE_TYPE_PHOTO
+    ): List<ImageAdjustSettings>? =
         suspendCancellableCoroutine { cont ->
             adjustResultCont = cont
             ImageAdjustActivity.bitmapsToAdjust = previews
             val intent = Intent(this, ImageAdjustActivity::class.java).apply {
                 putExtra(ImageAdjustActivity.EXTRA_READ_ONLY, isReadOnly)
+                putExtra(ImageAdjustActivity.EXTRA_FEATURE_TYPE, featureType)
             }
             adjustLauncher.launch(intent)
         }
@@ -417,7 +425,7 @@ class MainActivity : AppCompatActivity() {
 
             binding.progressCard.visibility = android.view.View.VISIBLE
             
-            val settingsList = showImageAdjustDialogs(bitmaps) ?: run {
+            val settingsList = showImageAdjustDialogs(bitmaps, featureType = ImageAdjustActivity.FEATURE_TYPE_VIDEO) ?: run {
                 binding.progressCard.visibility = android.view.View.GONE
                 return@launch
             }
@@ -525,7 +533,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     textLauncher.launch(intent)
                 }
-                "Photo", "Batch", "Video" -> {
+                "Photo", "Batch", "Video", "Composite" -> {
                     // Try to reacquire from original media
                     val originalBitmaps = tryReacquireOriginals(item)
                     

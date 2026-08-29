@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.View
 import android.widget.SeekBar
+import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.cadrega.posprinter.databinding.ActivityImageAdjustBinding
@@ -28,6 +29,12 @@ class ImageAdjustActivity : AppCompatActivity() {
     companion object {
         var bitmapsToAdjust: List<Bitmap> = emptyList()
         const val EXTRA_READ_ONLY = "extra_read_only"
+        const val EXTRA_FEATURE_TYPE = "extra_feature_type"
+        const val EXTRA_IS_FOR_COMPOSITE = "extra_is_for_composite"
+
+        const val FEATURE_TYPE_PHOTO = "photo"
+        const val FEATURE_TYPE_BATCH = "batch"
+        const val FEATURE_TYPE_VIDEO = "video"
         
         const val RESULT_SCALES = "result_scales"
         const val RESULT_BRIGHTNESSES = "result_brightnesses"
@@ -52,6 +59,8 @@ class ImageAdjustActivity : AppCompatActivity() {
     private var initialAlignments = listOf<Int>()
     private var initialGapMm = 2
 
+    private var hasChanges = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityImageAdjustBinding.inflate(layoutInflater)
@@ -69,12 +78,44 @@ class ImageAdjustActivity : AppCompatActivity() {
         isReadOnly = intent.getBooleanExtra(EXTRA_READ_ONLY, false)
 
         // Initialize settings
+        val featureType = intent.getStringExtra(EXTRA_FEATURE_TYPE) ?: FEATURE_TYPE_PHOTO
+        val defScale = when(featureType) {
+            FEATURE_TYPE_BATCH -> settingsManager.batchScale
+            FEATURE_TYPE_VIDEO -> settingsManager.videoScale
+            else -> settingsManager.photoScale
+        }
+        val defBrightness = when(featureType) {
+            FEATURE_TYPE_BATCH -> settingsManager.batchBrightness
+            FEATURE_TYPE_VIDEO -> settingsManager.videoBrightness
+            else -> settingsManager.photoBrightness
+        }
+        val defGamma = when(featureType) {
+            FEATURE_TYPE_BATCH -> settingsManager.batchGamma
+            FEATURE_TYPE_VIDEO -> settingsManager.videoGamma
+            else -> settingsManager.photoGamma
+        }
+        val defDither = when(featureType) {
+            FEATURE_TYPE_BATCH -> settingsManager.batchDither
+            FEATURE_TYPE_VIDEO -> settingsManager.videoDither
+            else -> settingsManager.photoDither
+        }
+        val defAlign = when(featureType) {
+            FEATURE_TYPE_BATCH -> settingsManager.batchAlign
+            FEATURE_TYPE_VIDEO -> settingsManager.videoAlign
+            else -> settingsManager.photoAlign
+        }
+        gapMm = when(featureType) {
+            FEATURE_TYPE_BATCH -> settingsManager.batchGap
+            FEATURE_TYPE_VIDEO -> settingsManager.videoGap
+            else -> 0
+        }
+
         for (i in bitmaps.indices) {
-            scales.add(100)
-            brightnesses.add(0)
-            gammas.add(1.0f)
-            algorithms.add(PrintImageUtils.DitherAlgorithm.FloydSteinberg)
-            alignments.add(SunmiPrinterHelper.ALIGN_CENTER)
+            scales.add(defScale)
+            brightnesses.add(defBrightness)
+            gammas.add(defGamma)
+            algorithms.add(PrintImageUtils.DitherAlgorithm.entries[defDither])
+            alignments.add(defAlign)
         }
         captureInitialState()
 
@@ -82,12 +123,18 @@ class ImageAdjustActivity : AppCompatActivity() {
         setupButtons()
         setupControls()
         
+        if (intent.getBooleanExtra(EXTRA_IS_FOR_COMPOSITE, false)) {
+            binding.printButton.text = "Add"
+        }
+
         if (bitmaps.size > 1 && !isReadOnly) {
             binding.batchControlsContainer.visibility = View.VISIBLE
             binding.gapContainer.visibility = View.VISIBLE
         }
 
         updateUIForCurrentIndex()
+        
+        onBackPressedDispatcher.addCallback(this) { handleBack() }
     }
 
     private fun captureInitialState() {
@@ -104,10 +151,11 @@ class ImageAdjustActivity : AppCompatActivity() {
         binding.toolbar.setOnMenuItemClickListener {
             if (it.itemId == R.id.action_undo) {
                 performUndo()
+                hasChanges = false
                 true
             } else false
         }
-        binding.toolbar.setNavigationOnClickListener { finish() }
+        binding.toolbar.setNavigationOnClickListener { handleBack() }
         
         if (isReadOnly) {
             binding.toolbar.title = if (bitmaps.size > 1) "History Batch (${bitmaps.size})" else "History Preview"
@@ -122,7 +170,7 @@ class ImageAdjustActivity : AppCompatActivity() {
             binding.editSettingsButton.visibility = View.GONE
             binding.originalImageContainer.visibility = View.VISIBLE
             binding.settingsContainer.visibility = View.VISIBLE
-            binding.printButton.text = "Print"
+            binding.printButton.text = if (intent.getBooleanExtra(EXTRA_IS_FOR_COMPOSITE, false)) "Add" else "Print"
             if (bitmaps.size > 1) {
                 binding.toolbar.title = "Adjust Batch (${bitmaps.size})"
                 binding.batchControlsContainer.visibility = View.VISIBLE
@@ -160,7 +208,20 @@ class ImageAdjustActivity : AppCompatActivity() {
             finish()
         }
 
-        binding.cancelButton.setOnClickListener { finish() }
+        binding.cancelButton.setOnClickListener { handleBack() }
+    }
+
+    private fun handleBack() {
+        if (hasChanges) {
+            com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setTitle("Discard Changes?")
+                .setMessage("You have unsaved adjustments. Are you sure you want to go back?")
+                .setPositiveButton("Discard") { _, _ -> finish() }
+                .setNegativeButton("Keep Editing", null)
+                .show()
+        } else {
+            finish()
+        }
     }
 
     private fun setupControls() {
@@ -205,6 +266,7 @@ class ImageAdjustActivity : AppCompatActivity() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 gapMm = progress
                 binding.gapLabel.text = "Frame Gap: $progress mm"
+                updateSetting { gapMm = progress }
                 if (fromUser) scheduleLivePreviewUpdate()
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -238,6 +300,7 @@ class ImageAdjustActivity : AppCompatActivity() {
     private fun updateSetting(action: () -> Unit) {
         if (isReadOnly) return
         action()
+        hasChanges = true
     }
 
     private fun performUndo() {
@@ -262,7 +325,7 @@ class ImageAdjustActivity : AppCompatActivity() {
             binding.originalImageContainer.visibility = View.VISIBLE
             binding.settingsContainer.visibility = View.VISIBLE
             binding.editSettingsButton.visibility = View.GONE
-            binding.printButton.text = "Print"
+            binding.printButton.text = if (intent.getBooleanExtra(EXTRA_IS_FOR_COMPOSITE, false)) "Add" else "Print"
             
             binding.originalImage.setImageBitmap(bitmap)
             binding.scaleSeekBar.progress = scales[currentIndex] - 10

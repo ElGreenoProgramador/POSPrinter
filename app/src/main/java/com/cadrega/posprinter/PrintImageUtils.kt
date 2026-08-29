@@ -3,6 +3,7 @@ package com.cadrega.posprinter
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Paint
 import kotlin.math.roundToInt
 
 /**
@@ -173,4 +174,68 @@ object PrintImageUtils {
         val scaled = scaleToPrinterWidth(src, targetWidth)
         return ditherForThermalPrint(scaled, brightness, gamma, algorithm)
     }
+
+    fun renderMarkdownToBitmap(text: String, printerWidthPx: Int, fontScale: Float = 1.0f): Bitmap {
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.BLACK
+            textSize = 24f * fontScale
+        }
+        
+        val lines = text.split("\n")
+        val renderedLines = mutableListOf<RenderedLine>()
+        
+        var totalHeight = 30f
+        
+        for (line in lines) {
+            val trimmed = line.trim()
+            val style = when {
+                trimmed.startsWith("# ") -> RenderStyle(trimmed.substring(2), 38f * fontScale, true, SunmiPrinterHelper.ALIGN_CENTER)
+                trimmed.startsWith("## ") -> RenderStyle(trimmed.substring(3), 32f * fontScale, true, SunmiPrinterHelper.ALIGN_CENTER)
+                trimmed.startsWith("### ") -> RenderStyle(trimmed.substring(4), 28f * fontScale, true, SunmiPrinterHelper.ALIGN_LEFT)
+                trimmed.startsWith("- ") || trimmed.startsWith("* ") -> RenderStyle(" • " + trimmed.substring(2), 24f * fontScale, false, SunmiPrinterHelper.ALIGN_LEFT)
+                trimmed.contains("**") -> RenderStyle(trimmed.replace("**", ""), 24f * fontScale, true, SunmiPrinterHelper.ALIGN_LEFT)
+                else -> RenderStyle(line, 24f * fontScale, false, SunmiPrinterHelper.ALIGN_LEFT)
+            }
+            
+            paint.textSize = style.size
+            paint.isFakeBoldText = style.bold
+            
+            val maxWidth = printerWidthPx - 20f
+            if (style.text.isEmpty()) {
+                totalHeight += 24f * fontScale
+            } else {
+                var start = 0
+                while (start < style.text.length) {
+                    val count = paint.breakText(style.text, start, style.text.length, true, maxWidth, null)
+                    val part = style.text.substring(start, start + count)
+                    renderedLines.add(RenderedLine(part, style.size, style.bold, style.align))
+                    totalHeight += style.size + 6f
+                    start += count
+                }
+            }
+        }
+        
+        val bitmap = Bitmap.createBitmap(printerWidthPx, totalHeight.toInt().coerceAtLeast(100), Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        canvas.drawColor(Color.WHITE)
+        
+        var y = 40f
+        for (rl in renderedLines) {
+            paint.textSize = rl.size
+            paint.isFakeBoldText = rl.bold
+            val textWidth = paint.measureText(rl.text)
+            val x = when (rl.align) {
+                SunmiPrinterHelper.ALIGN_CENTER -> (printerWidthPx - textWidth) / 2
+                SunmiPrinterHelper.ALIGN_RIGHT -> printerWidthPx - textWidth - 10f
+                else -> 10f
+            }
+            canvas.drawText(rl.text, x, y, paint)
+            y += rl.size + 6f
+        }
+        
+        return ditherForThermalPrint(bitmap)
+    }
+
+    private data class RenderStyle(val text: String, val size: Float, val bold: Boolean, val align: Int)
+    private data class RenderedLine(val text: String, val size: Float, val bold: Boolean, val align: Int)
 }

@@ -30,6 +30,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- Hardware Section -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -84,14 +85,14 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="58mm (384px)" />
+                            android:text="58mm" />
 
                         <com.google.android.material.radiobutton.MaterialRadioButton
                             android:id="@+id/width80Radio"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="80mm (576px)" />
+                            android:text="80mm" />
                     </RadioGroup>
 
                     <com.google.android.material.divider.MaterialDivider
@@ -103,7 +104,7 @@
                         android:id="@+id/feedLinesLabel"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Paper Feed Lines: 4"
+                        android:text="Post-print feed lines"
                         style="@style/TextAppearance.Material3.LabelLarge" />
 
                     <SeekBar
@@ -111,12 +112,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:max="10"
-                        android:progress="4"
                         android:paddingVertical="12dp" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Application Section -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -127,6 +128,7 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
                 app:cardElevation="0dp"
                 app:strokeWidth="1dp"
                 app:strokeColor="?attr/colorOutlineVariant">
@@ -141,7 +143,7 @@
                         android:id="@+id/historyLimitLabel"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="History Item Limit: 30"
+                        android:text="History Limit"
                         style="@style/TextAppearance.Material3.LabelLarge" />
 
                     <SeekBar
@@ -149,7 +151,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:max="100"
-                        android:progress="30"
                         android:paddingVertical="12dp" />
 
                     <com.google.android.material.divider.MaterialDivider
@@ -161,7 +162,7 @@
                         android:id="@+id/fontScaleLabel"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Text Font Scale: 100%"
+                        android:text="Text Font Scale"
                         style="@style/TextAppearance.Material3.LabelLarge" />
 
                     <SeekBar
@@ -169,10 +170,63 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:max="100"
-                        android:progress="50"
                         android:paddingVertical="12dp" />
 
                 </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Photo Defaults Section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Photo Defaults"
+                style="@style/TextAppearance.Material3.TitleMedium"
+                android:layout_marginBottom="8dp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorOutlineVariant">
+                <include android:id="@+id/photoDefaults" layout="@layout/view_feature_defaults" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Batch Defaults Section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Batch Defaults"
+                style="@style/TextAppearance.Material3.TitleMedium"
+                android:layout_marginBottom="8dp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorOutlineVariant">
+                <include android:id="@+id/batchDefaults" layout="@layout/view_feature_defaults" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Video Defaults Section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Video Defaults"
+                style="@style/TextAppearance.Material3.TitleMedium"
+                android:layout_marginBottom="8dp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="32dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorOutlineVariant">
+                <include android:id="@+id/videoDefaults" layout="@layout/view_feature_defaults" />
             </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>

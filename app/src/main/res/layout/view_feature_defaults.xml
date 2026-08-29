@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/scaleLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Default Scale"
+        style="@style/TextAppearance.Material3.LabelLarge" />
+
+    <SeekBar
+        android:id="@+id/scaleSeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="90"
+        android:paddingVertical="8dp" />
+
+    <TextView
+        android:id="@+id/brightnessLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Default Brightness"
+        android:layout_marginTop="12dp"
+        style="@style/TextAppearance.Material3.LabelLarge" />
+
+    <SeekBar
+        android:id="@+id/brightnessSeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="200"
+        android:paddingVertical="8dp" />
+
+    <TextView
+        android:id="@+id/gammaLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Default Gamma"
+        android:layout_marginTop="12dp"
+        style="@style/TextAppearance.Material3.LabelLarge" />
+
+    <SeekBar
+        android:id="@+id/gammaSeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="200"
+        android:paddingVertical="8dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Dithering Algorithm"
+        android:layout_marginTop="12dp"
+        style="@style/TextAppearance.Material3.LabelLarge" />
+
+    <Spinner
+        android:id="@+id/ditherSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Alignment"
+        android:layout_marginTop="12dp"
+        style="@style/TextAppearance.Material3.LabelLarge" />
+
+    <RadioGroup
+        android:id="@+id/alignmentRadioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+
+        <com.google.android.material.radiobutton.MaterialRadioButton
+            android:id="@+id/alignLeftRadio"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Left" />
+
+        <com.google.android.material.radiobutton.MaterialRadioButton
+            android:id="@+id/alignCenterRadio"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Center" />
+
+        <com.google.android.material.radiobutton.MaterialRadioButton
+            android:id="@+id/alignRightRadio"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Right" />
+    </RadioGroup>
+
+    <LinearLayout
+        android:id="@+id/gapContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/gapLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Default Gap"
+            android:layout_marginTop="12dp"
+            style="@style/TextAppearance.Material3.LabelLarge" />
+
+        <SeekBar
+            android:id="@+id/gapSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="10"
+            android:paddingVertical="8dp" />
+    </LinearLayout>
+
+</LinearLayout>

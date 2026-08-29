@@ -11,6 +11,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.cadrega.posprinter.databinding.ActivityTextAdjustBinding
@@ -36,9 +37,11 @@ class TextAdjustActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_TEXT = "extra_text"
         const val RESULT_TEXT = "result_text"
+        const val EXTRA_IS_FOR_COMPOSITE = "extra_is_for_composite"
     }
 
     private var initialText = ""
+    private var hasChanges = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,10 +58,15 @@ class TextAdjustActivity : AppCompatActivity() {
         binding.toolbar.setOnMenuItemClickListener {
             if (it.itemId == R.id.action_undo) {
                 binding.textInput.setText(initialText)
+                hasChanges = false
                 true
             } else false
         }
-        binding.toolbar.setNavigationOnClickListener { finish() }
+        binding.toolbar.setNavigationOnClickListener { handleBack() }
+        
+        if (intent.getBooleanExtra(EXTRA_IS_FOR_COMPOSITE, false)) {
+            binding.printButton.text = "Add"
+        }
 
         binding.loadFileButton.setOnClickListener {
             pickTextFileLauncher.launch("text/*")
@@ -68,6 +76,7 @@ class TextAdjustActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
+                hasChanges = s?.toString() != initialText
                 schedulePreviewUpdate()
             }
         })
@@ -82,6 +91,21 @@ class TextAdjustActivity : AppCompatActivity() {
         }
 
         schedulePreviewUpdate()
+        
+        onBackPressedDispatcher.addCallback(this) { handleBack() }
+    }
+
+    private fun handleBack() {
+        if (hasChanges) {
+            com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setTitle("Discard Changes?")
+                .setMessage("You have unsaved edits. Are you sure you want to go back?")
+                .setPositiveButton("Discard") { _, _ -> finish() }
+                .setNegativeButton("Keep Editing", null)
+                .show()
+        } else {
+            finish()
+        }
     }
 
     private fun loadTextFromFile(uri: Uri) {
@@ -92,10 +116,10 @@ class TextAdjustActivity : AppCompatActivity() {
             try {
                 contentResolver.openInputStream(uri)?.use { inputStream ->
                     val text = inputStream.bufferedReader().use { it.readText() }
-                    // Limit text to 50k chars for smoother editing
                     val limitedText = if (text.length > 50000) text.substring(0, 50000) else text
                     withContext(Dispatchers.Main) {
                         binding.textInput.setText(limitedText)
+                        hasChanges = true
                     }
                 }
             } catch (e: Exception) {
@@ -116,74 +140,9 @@ class TextAdjustActivity : AppCompatActivity() {
         previewJob = lifecycleScope.launch {
             delay(500) // Debounce typing
             val previewBitmap = withContext(Dispatchers.Default) {
-                renderMarkdownPreview(text)
+                PrintImageUtils.renderMarkdownToBitmap(text, printerWidthPx, settingsManager.fontScale)
             }
             binding.textPreviewImage.setImageBitmap(previewBitmap)
         }
     }
-
-    private fun renderMarkdownPreview(text: String): Bitmap {
-        val scale = settingsManager.fontScale
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = Color.BLACK
-            textSize = 24f * scale
-        }
-        
-        val lines = text.split("\n")
-        val renderedLines = mutableListOf<RenderedLine>()
-        
-        var totalHeight = 30f
-        
-        for (line in lines) {
-            val trimmed = line.trim()
-            val style = when {
-                trimmed.startsWith("# ") -> RenderStyle(trimmed.substring(2), 38f * scale, true, SunmiPrinterHelper.ALIGN_CENTER)
-                trimmed.startsWith("## ") -> RenderStyle(trimmed.substring(3), 32f * scale, true, SunmiPrinterHelper.ALIGN_CENTER)
-                trimmed.startsWith("### ") -> RenderStyle(trimmed.substring(4), 28f * scale, true, SunmiPrinterHelper.ALIGN_LEFT)
-                trimmed.startsWith("- ") || trimmed.startsWith("* ") -> RenderStyle(" • " + trimmed.substring(2), 24f * scale, false, SunmiPrinterHelper.ALIGN_LEFT)
-                trimmed.contains("**") -> RenderStyle(trimmed.replace("**", ""), 24f * scale, true, SunmiPrinterHelper.ALIGN_LEFT)
-                else -> RenderStyle(line, 24f * scale, false, SunmiPrinterHelper.ALIGN_LEFT)
-            }
-            
-            paint.textSize = style.size
-            paint.isFakeBoldText = style.bold
-            
-            val maxWidth = printerWidthPx - 20f
-            if (style.text.isEmpty()) {
-                totalHeight += 24f
-            } else {
-                var start = 0
-                while (start < style.text.length) {
-                    val count = paint.breakText(style.text, start, style.text.length, true, maxWidth, null)
-                    val part = style.text.substring(start, start + count)
-                    renderedLines.add(RenderedLine(part, style.size, style.bold, style.align))
-                    totalHeight += style.size + 6f
-                    start += count
-                }
-            }
-        }
-        
-        val bitmap = Bitmap.createBitmap(printerWidthPx, totalHeight.toInt().coerceAtLeast(100), Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        canvas.drawColor(Color.WHITE)
-        
-        var y = 40f
-        for (rl in renderedLines) {
-            paint.textSize = rl.size
-            paint.isFakeBoldText = rl.bold
-            val textWidth = paint.measureText(rl.text)
-            val x = when (rl.align) {
-                SunmiPrinterHelper.ALIGN_CENTER -> (printerWidthPx - textWidth) / 2
-                SunmiPrinterHelper.ALIGN_RIGHT -> printerWidthPx - textWidth - 10f
-                else -> 10f
-            }
-            canvas.drawText(rl.text, x, y, paint)
-            y += rl.size + 6f
-        }
-        
-        return PrintImageUtils.ditherForThermalPrint(bitmap)
-    }
-
-    private data class RenderStyle(val text: String, val size: Float, val bold: Boolean, val align: Int)
-    private data class RenderedLine(val text: String, val size: Float, val bold: Boolean, val align: Int)
 }
